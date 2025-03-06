@@ -1,0 +1,17 @@
+version: "3.3"
+
+services:
+  loki:
+    image: grafana/loki:2.6.1
+    ports:
+      - "3100:3100"
+    volumes:
+      - /opt/docker/configs/loki/:/etc/loki/  # Monta o arquivo de configuração específico
+      - loki:/loki  # Volume persistente para dados do Loki
+    command: -config.file=/etc/loki/loki-config.yaml
+    networks:
+      - observability
+volumes:
+  loki:
+networks:
+  observability:

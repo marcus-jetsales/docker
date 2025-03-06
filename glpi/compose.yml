@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  glpi:
+    image: aprendendolinux/glpi-alpine
+    restart: always
+    container_name: glpi
+    environment:
+      TIMEZONE: "America/Sao_Paulo"
+      VERSION: 10.0.17
+      UPLOAD_MAX_FILESIZE: 100M
+      POST_MAX_FILESIZE: 50M
+    volumes:
+      - glpi:/var/www/localhost/htdocs   # Volume persistente para o GLPI
+    ports:
+      - "9444:80"  # Mapeia a porta 80 do container para a porta 9444 do host
+
+volumes:
+  glpi:

@@ -1,0 +1,15 @@
+services:
+  mysql:
+    image: mysql                              # Imagem do MySQL 
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: P@$$w0rd           # Senha do root do MySQL
+      MYSQL_DATABASE: jetsales-glpi           # Banco de dados a ser criado
+      MYSQL_USER: jet-glpi                    # Usuário do banco de dados
+      MYSQL_PASSWORD: jet-glpi-senha          # Senha do usuário 'glpi'
+    volumes:
+      - mysql:/var/lib/mysql                  # Volume persistente para dados
+    ports:
+      - "3306:3306"                           # Mapeia a porta 3306 do container para a máquina host
+volumes:
+  mysql:

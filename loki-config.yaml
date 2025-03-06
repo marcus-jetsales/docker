@@ -1,0 +1,62 @@
+server:
+  http_listen_address: 0.0.0.0
+  http_listen_port: 3100
+  grcp_listen_port: 9095
+
+auth_enabled: false
+
+ingester:
+  chunk_idle_period: 3m
+  chunk_blocks_size: 262144
+  chunk_retain_period: 1m
+  max_transfer_retries: 0
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+  wal:
+    dir: /loki/wal
+
+limits_config:
+  enforce_metric_name: false
+  reject_old_samples: true
+  reject_old_samples_max_age: 360h
+
+schema_config:
+  configs:
+    - from: 2020-05-15
+      store: boltdb-shipper
+      object_store: s3
+      schema: v11
+      index:
+        prefix: loki_
+        period: 24h
+
+storage_config:
+  boltdb_shiper:
+    active_index_directory: /loki/index
+    cach_location: /loki/index_cache
+    shared_store: s3
+  aws:
+    bucketnames: loki
+    endpoint: https://minio.mvpos.app.br
+    region: sa-east-1
+    access_key_id: jetloki
+    secret_access_key: M@rcus20316669
+    s3forcepathstyle: true
+
+chunk_store_config:
+  max_look_back_period: 0s
+
+table_manager:
+  retention_deletes_enabled: true  # Habilita a exclusão de logs antigos
+  retention_period: 360h
+
+compactor:
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 150h
+  retention_enabled: true
+  working_directory: /loki/compactor  # Local para os arquivos do compactor (ajustável conforme necessário)
+  shared_store: s3
+  compaction_interbal: 1m

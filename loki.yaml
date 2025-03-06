@@ -1,0 +1,47 @@
+version: "3.3"
+
+services:
+  loki:
+    image: grafana/loki:2.6.1
+    ports:
+      - "3100:3100"
+    volumes:
+      - /opt/docker/configs/loki/:/etc/loki/  # Monta o arquivo de configuração específico
+      - /opt/docker/volumes/loki_data:/data  # Volume persistente para dados do Loki
+    command: 
+      - --config.expand-env=true
+      - --config.file=/etc/loki/loki-config.yaml
+    networks:
+      - observability
+
+  grafana:
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_FEATURE_TOGGLES_ENABLE=alertingSimplifiedRouting,alertingQueryAndExpressionsStepMode
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - /opt/docker/volumes/grafana_data/:/var/lib/grafana # Volumes para persistir os dados do Grafana
+      - /opt/docker/volumes/grafana_provisioning/:/etc/grafana/provisioning # Volumes para persistir o arquivo de provisionamento
+      - /opt/docker/volumes/grafana_datasource/:/etc/grafana/provisioning/datasources # Persistir a configuração de datasource
+    networks:
+      - observability
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - /opt/docker/configs/prometheus/:/etc/prometheus/
+      - /opt/docker/configs/prometheus/rules.yml:/etc/prometheus/rules.yml
+    command: 
+      - --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - observability
+    ports:
+      - 9090:9090
+
+networks:
+  observability:
+    driver: bridge

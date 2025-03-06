@@ -1,0 +1,40 @@
+version: "3.7"
+
+services:
+  
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server ~ --address ":9000" --console-address ":9001"
+    volumes:
+      - minio:/data/
+    networks:
+      - observability
+
+  createbuckets:
+    image: minio/mc
+    container_name: minio-bucket
+    networks:
+      - observability
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc rm -r --force myminio/loki;
+      /usr/bin/mc mb myminio/loki;
+      /usr/bin/mc policy set public myminio/loki;
+      exit 0;
+      "
+    environment:
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+      - MINIO_UPDATE=off
+networks:
+  observability:
+
+volumes:
+  minio:
